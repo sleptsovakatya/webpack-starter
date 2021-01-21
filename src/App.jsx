@@ -1,17 +1,25 @@
-import React, { useEffect} from 'react'
-import Context from "@/context";
-import TodoList from "@/Todo/TodoList.jsx";
-import Loader from "@/Loader.jsx";
-import Modal from "@/Modal/Modal.jsx";
+import React from 'react'
+import TodoList from "@/components/TodoList.jsx";
+import Loader from "@/components/Loader.jsx";
+import Modal from "@/components/Modal/Modal.jsx";
+import {fetchTodos} from "@/redux/action";
+import {useDispatch, useSelector} from "react-redux";
+import Alert from "@/components/Alert.jsx";
+
+
 
 //lazy loading
+//имитация задержки
 const AddTodo = React.lazy(() => new Promise(resolve => {
     setTimeout(() => {
-        resolve(import('@/Todo/AddTodo.jsx'))
+        resolve(import('@/components/AddTodo.jsx'))
     }, 4000)
 }))
 
 function App() {
+    /*
+    Реализация без Redux
+
     const [todos, setTodos] = React.useState([])
     const [loading, setLoading] = React.useState(true)
 
@@ -23,49 +31,47 @@ function App() {
                     setTodos(todos)
                     setLoading(false)
                 }, 2000))
-    }, [])
+    }, [])*/
 
-    function toggleTodo(id) {
-        setTodos(todos.map(todo => {
-            if(todo.id === id) {
-                todo.completed = !todo.completed
-            }
-            return todo
-        }))
-    }
+    const todos = useSelector(state => state.todo.todos)
+    const alert = useSelector(state => state.app.alert)
 
-    function deleteTodo(id) {
-        setTodos(todos.filter(todo => todo.id !== id))
-    }
-
-    function addTodo(title) {
-        setTodos(todos.concat([
-            {
-                id: Date.now(),
-                completed: false,
-                title: title
-            }
-        ]))
+    if (!todos.length) {
+        useDispatch()(fetchTodos())
     }
 
     return (
-        <Context.Provider value={{ deleteTodo, toggleTodo}}>
-            <div className="wrapper">
-                <h1>React tutorial</h1>
-                <Modal/>
-                {/*lazy loading*/}
-                <React.Suspense fallback={<Loader/>}>
-                    <AddTodo onCreate={addTodo}/>
-                </React.Suspense>
-                {loading && <Loader/>}
-                {todos.length ? <TodoList todos={todos}/> : loading ? null : <p>No todos!</p>}
-                <hr/>
-                <div className="logo"/>
-                <hr/>
+        <div className="container sm">
+            <h1>React tutorial</h1>
+            <div className="row">
+                {alert && <Alert text={alert}/>}
+                <div className="col">
+                    <Modal/>
+                </div>
                 <pre/>
-                <hr/>
             </div>
-        </Context.Provider>
+            <div className="row">
+                <div className="col">
+                    {/*lazy loading*/}
+                    <React.Suspense fallback={<Loader/>}>
+                        <AddTodo/>
+                    </React.Suspense>
+                </div>
+                <pre/>
+                <pre/>
+            </div>
+            <div className="row">
+                <div className="col">
+                    <TodoList/>
+                </div>
+                <pre/>
+            </div>
+            <div className="row">
+                <div className="col">
+                    <div className="logo"/>
+                </div>
+            </div>
+        </div>
     )
 }
 

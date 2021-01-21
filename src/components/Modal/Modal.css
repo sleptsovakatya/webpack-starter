@@ -10,11 +10,14 @@
     padding-top: 5rem;
 }
 
+.modal-content {
+    background: cornflowerblue;
+    color: white;
+}
+
 .modal-body {
     padding: 2rem;
     width: 400px;
     border-radius: 5px;
-    background: cornflowerblue;
     height: 200px;
-    color: white;
 }

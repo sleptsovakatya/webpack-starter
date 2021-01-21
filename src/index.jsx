@@ -1,5 +1,4 @@
 /*import * as $ from 'jquery'*/
-import Post from '@models/Post'
 import json from '@/assets/json'
 import logo from '@/assets/webpack-logo.png'
 import xml from '@/assets/data.xml'
@@ -9,12 +8,20 @@ import '@/babel'
 import React from 'react'
 import {render} from 'react-dom'
 import App from "@/App.jsx";
+import {applyMiddleware, createStore} from "redux";
+import {rootReducer} from "@/redux/rootReducer";
+import {composeWithDevTools} from "redux-devtools-extension";
+import thunk from "redux-thunk";
+import {Provider} from "react-redux";
+import {forbiddenWordsMiddleware} from "@/redux/middleware";
 
+const store = createStore(rootReducer,
+    composeWithDevTools(applyMiddleware(thunk, forbiddenWordsMiddleware)))
 
-const post = new Post('Webpack post title', logo)
+const app = (
+    <Provider store={store}>
+        <App/>
+    </Provider>
+)
 
-
-/*$('pre').addClass('code').html(post.toString())*/
-
-
-render(<App />, document.getElementById('app'))
+render(app, document.getElementById('app'))
